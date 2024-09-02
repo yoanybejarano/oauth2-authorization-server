@@ -13,18 +13,10 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
-import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
@@ -44,8 +36,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AuthorizationSecurityConfig {
 
-    private final PasswordEncoder passwordEncoder;
-
     @Bean
     @Order(1)
     public SecurityFilterChain authSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -61,9 +51,9 @@ public class AuthorizationSecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**").permitAll().anyRequest().authenticated())
+        http.authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**", "/client/**").permitAll().anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults());
-        http.csrf(csrf -> csrf.ignoringRequestMatchers("/auth/**"));
+        http.csrf(csrf -> csrf.ignoringRequestMatchers("/auth/**", "/client/**"));
         return http.build();
     }
 
@@ -77,7 +67,7 @@ public class AuthorizationSecurityConfig {
         return new InMemoryUserDetailsManager(userDetails);
     }*/
 
-    @Bean
+   /* @Bean
     public RegisteredClientRepository registeredClientRepository(){
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("client")
@@ -91,7 +81,12 @@ public class AuthorizationSecurityConfig {
                 .clientSettings(clientSettings())
                 .build();
         return new InMemoryRegisteredClientRepository(registeredClient);
-    }
+    }*/
+
+    /*@Bean
+    public ClientSettings clientSettings(){
+        return ClientSettings.builder().requireProofKey(true).build();
+    }*/
 
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer() {
@@ -108,10 +103,7 @@ public class AuthorizationSecurityConfig {
         };
     }
 
-    @Bean
-    public ClientSettings clientSettings(){
-        return ClientSettings.builder().requireProofKey(true).build();
-    }
+
 
     @Bean
     public AuthorizationServerSettings authorizationServerSettings(){
