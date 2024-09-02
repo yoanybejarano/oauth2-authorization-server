@@ -36,7 +36,7 @@ public class Client {
     private boolean requireProofKey;
 
     public static RegisteredClient toRegisteredClient(Client client) {
-        RegisteredClient builder = RegisteredClient.withId(client.getClientId())
+        return RegisteredClient.withId(client.getClientId())
                 .clientId(client.getClientId())
                 .clientSecret(client.getClientSecret())
                 .clientIdIssuedAt(new Date().toInstant())
@@ -46,7 +46,6 @@ public class Client {
                 .scopes(sc -> sc.addAll(client.getScopes()))
                 .clientSettings(ClientSettings.builder().requireProofKey(client.isRequireProofKey()).build())
                 .build();
-        return builder;
 
     }
 

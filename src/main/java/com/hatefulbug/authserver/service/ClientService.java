@@ -20,7 +20,7 @@ public class ClientService implements RegisteredClientRepository {
     private final PasswordEncoder passwordEncoder;
 
     private Client createClientFromDto(ClientDto clientDto) {
-        Client client = Client.builder()
+        return Client.builder()
                 .clientId(clientDto.getClientId())
                 .clientSecret(passwordEncoder.encode(clientDto.getClientSecret()))
                 .authenticationMethods(clientDto.getAuthenticationMethods())
@@ -29,7 +29,6 @@ public class ClientService implements RegisteredClientRepository {
                 .scopes(clientDto.getScopes())
                 .requireProofKey(clientDto.isRequireProofKey())
                 .build();
-        return client;
     }
 
     @Override
